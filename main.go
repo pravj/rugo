@@ -6,21 +6,21 @@ import (
 	//"reflect"
 	"io/ioutil"
 
-  "github.com/pravj/rugo/utils"
-	"github.com/pravj/rugo/scanner"
 	"github.com/pravj/rugo/parser"
+	"github.com/pravj/rugo/scanner"
+	"github.com/pravj/rugo/utils"
 )
 
 func main() {
-  // read the S-expression file
+	// read the S-expression file
 	content, err := ioutil.ReadFile("expr.s")
 	utils.CheckError(err)
 
-  // scan the input string
+	// scan the input string
 	s := scanner.NewScanner(string(content))
-  s.ScanTokens()
+	s.ScanTokens()
 
-  // token output
+	// token output
 	//fmt.Println(string(content))
 	//fmt.Println(s.Tokens)
 

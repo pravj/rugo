@@ -14,10 +14,10 @@ const (
 	COMMA
 	//COLON
 
-	STRING // alphabates with a quote around
-	NAME   // alphabates without a quote around
+	STRING  // alphabates with a quote around
+	NAME    // alphabates without a quote around
 	KEYWORD // NAME WITH A COLON (':') PREFIX
-	NUMBER // [0-9]+(\.[0-9]+)?
+	NUMBER  // [0-9]+(\.[0-9]+)?
 
 	PLUS
 	MINUS
