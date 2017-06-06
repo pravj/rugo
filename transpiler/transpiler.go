@@ -61,6 +61,23 @@ func localVarAssignStmt(node ast.Node, p *program.Program) goast.Stmt {
   }
 }
 
+func printStmt(node ast.Node, p *program.Program) goast.Stmt {
+  stmt := &goast.ExprStmt{
+    X: &goast.CallExpr{
+      Fun: &goast.SelectorExpr{
+        X: goast.NewIdent("fmt"),
+        Sel: goast.NewIdent("Println"),
+      },
+      Args: []goast.Expr{TranspileNode(node, p).(goast.Expr)},
+    },
+  }
+
+  // import the "fmt" package
+  p.AddImport("fmt")
+
+  return stmt
+}
+
 func TranspileNode(node ast.Node, p *program.Program) goast.Node {
 	switch node.Name {
   case ":true":
@@ -73,6 +90,10 @@ func TranspileNode(node ast.Node, p *program.Program) goast.Node {
     return floatLiteral(node)
   case ":str":
     return stringLiteral(node)
+  case ":send":
+    if ((len(node.Nodes) == 3) && (node.Nodes[0].Name == "nil") && (node.Nodes[1].Name == ":puts")) {
+      p.AppendMainStatement(printStmt(node.Nodes[2], p))
+    }
   case ":lvasgn":
     p.AppendMainStatement(localVarAssignStmt(node, p))
   default:

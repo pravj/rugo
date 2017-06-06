@@ -4,6 +4,7 @@ package program
 import (
 	"bytes"
 	"fmt"
+	"strconv"
 	"go/format"
 
 	goast "go/ast"
@@ -35,6 +36,9 @@ type Program struct {
 	// map from an identifier to its scope
 	// helpful in case of Ruby's assignment to check if a name is already defined
 	SymbolTable map[string]string
+
+	// imported path for the program
+	Imports []string
 }
 
 // NewProgram returns a new program instance (*Program)
@@ -56,6 +60,7 @@ func (p *Program) String() string {
 	utils.CheckError(err)
 	p.File = f
 
+	// main function
 	p.File.Decls = append(p.File.Decls, &goast.FuncDecl{
 		Name: goast.NewIdent("main"),
 		Type: &goast.FuncType{
@@ -66,6 +71,25 @@ func (p *Program) String() string {
 		},
 	})
 
+	// add grouped imports
+	importDecl := &goast.GenDecl{
+		Tok:    gotoken.IMPORT,
+		Lparen: 1,
+	}
+
+	for _, quotedImportPath := range p.Imports {
+		importSpec := &goast.ImportSpec{
+			Path: &goast.BasicLit{
+				Kind:  gotoken.IMPORT,
+				Value: quotedImportPath,
+			},
+		}
+
+		importDecl.Specs = append(importDecl.Specs, importSpec)
+	}
+
+	p.File.Decls = append([]goast.Decl{importDecl}, p.File.Decls...)
+
 	// use the backbone of "gofmt" to get a string representation from AST
 	var buf bytes.Buffer
 	format.Node(&buf, p.FileSet, p.File)
@@ -73,7 +97,21 @@ func (p *Program) String() string {
 	return buf.String()
 }
 
-// AppendMainStatement adds a new statement to the main function
+// AppendMainStatement adds a new statement to the main function.
 func (p *Program) AppendMainStatement(stmt goast.Stmt) {
 	p.MainStatements = append(p.MainStatements, stmt)
+}
+
+// AddImport adds an import path if it's not in the import list.
+func (p *Program) AddImport(importPath string) {
+	quotedImportPath := strconv.Quote(importPath)
+
+	for _, i := range p.Imports {
+		// ignore if the path is in the list
+		if i == quotedImportPath {
+			return
+		}
+	}
+
+	p.Imports = append(p.Imports, quotedImportPath)
 }
