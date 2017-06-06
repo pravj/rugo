@@ -4,7 +4,7 @@ Package parser implements the top-down parsing of tokenised input string.
 package parser
 
 import (
-	//"fmt"
+	"github.com/pravj/rugo/ast"
 	"github.com/pravj/rugo/token"
 )
 
@@ -17,29 +17,18 @@ type Parser struct {
 	current int
 }
 
-// Node represents
-type Node struct {
-	Name  string
-	Nodes []Node
-}
-
-// NewNode returns a new Node instance (*Node)
-func NewNode() Node {
-	return Node{}
-}
-
 // NewParser returns a new instance of Parser (*Parser)
 func NewParser(tokens []token.Token) *Parser {
 	return &Parser{tokens: tokens, current: 0}
 }
 
 // parse starts the process of top-down parsing.
-func (p *Parser) Parse() Node {
+func (p *Parser) Parse() ast.Node {
 	t := p.advanceToken()
 
-	if t.Lexeme == "(" {
+	if (t.TypeOfToken == token.S_EXP_OPEN) {
 		// initialize a new node list
-		NodeList := NewNode()
+		NodeList := ast.NewNode()
 		if NodeList.Name == "" {
 			NodeList.Name = p.peek(0).Lexeme
 		}
@@ -58,7 +47,8 @@ func (p *Parser) Parse() Node {
 	} else if t.Lexeme == ")" {
 		panic("Unexpected closing bracet ')'.")
 	} else {
-		node := Node{Name: t.Lexeme}
+		node := ast.Node{Name: t.Lexeme}
+
 		return node
 	}
 }

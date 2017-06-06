@@ -149,7 +149,13 @@ func (s *Scanner) scanNameLiteral() {
 		s.nextCharacter()
 	}
 
-	s.addToken(token.NAME)
+	// add S_EXP_OPEN token if we get a NAME followed by LEFT_PAREN
+	if s.matchCharacter("(") {
+		s.addToken(token.S_EXP_OPEN)
+	} else {
+		// only NAME when the next character isn't a LEFT_PAREN
+		s.addToken(token.NAME)
+	}
 }
 
 // scanNumberPart scans the sections of a number-type token.

@@ -8,7 +8,8 @@ const (
 	EOF TokenType = iota
 	INVALID
 
-	LEFT_PAREN
+	LEFT_PAREN  // only LEFT_PAREN
+	S_EXP_OPEN  // NAME followed by LEFT_PAREN
 	RIGHT_PAREN
 
 	COMMA
