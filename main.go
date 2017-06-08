@@ -1,4 +1,5 @@
 // Package main
+// AST visualizer web app
 package main
 
 import (

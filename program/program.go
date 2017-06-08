@@ -98,8 +98,8 @@ func (p *Program) String() string {
 }
 
 // AppendMainStatement adds a new statement to the main function.
-func (p *Program) AppendMainStatement(stmt goast.Stmt) {
-	p.MainStatements = append(p.MainStatements, stmt)
+func (p *Program) AppendMainStatement(stmt goast.Node) {
+	p.MainStatements = append(p.MainStatements, stmt.(goast.Stmt))
 }
 
 // AddImport adds an import path if it's not in the import list.
