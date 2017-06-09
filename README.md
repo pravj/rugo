@@ -1,4 +1,4 @@
 rugo
 ====
 
-Ruby to Go transpiler toolchain.
+An experimental Ruby to Go transpiler toolchain. [under-development]

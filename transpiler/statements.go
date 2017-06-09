@@ -11,7 +11,7 @@ import (
   "github.com/pravj/rugo/program"
 )
 
-func localVarAssignStmt(node ast.Node, p *program.Program) goast.Node {
+func localVarAssignStmt(isRoot bool, node ast.Node, p *program.Program) goast.Node {
   if len(node.Nodes) == 2 {
     tokenType := gotoken.DEFINE
 
@@ -24,6 +24,8 @@ func localVarAssignStmt(node ast.Node, p *program.Program) goast.Node {
       Tok: tokenType,
       Rhs: []goast.Expr{TranspileNode(false, node.Nodes[1], p).(goast.Expr)},
     }
+
+    if isRoot { p.AppendMainStatement(stmt) }
 
     return stmt
   } else {
@@ -48,13 +50,15 @@ func printStmt(node ast.Node, p *program.Program) goast.Node {
   return stmt
 }
 
-func ifStmt(node ast.Node, p *program.Program) goast.Stmt {
+func ifStmt(isRoot bool, node ast.Node, p *program.Program) goast.Node {
   stmt := &goast.IfStmt{
     Cond: TranspileNode(false, node.Nodes[0], p).(goast.Expr),
     Body: &goast.BlockStmt{
       List: ifStmtBody(node.Nodes[1], p),
     },
   }
+
+  if isRoot { p.AppendMainStatement(stmt) }
 
   return stmt
 }
@@ -72,4 +76,20 @@ func ifStmtBody(node ast.Node, p *program.Program) []goast.Stmt {
   }
 
   return stmts
+}
+
+func sendStmt(isRoot bool, node ast.Node, p *program.Program) goast.Node {
+  // send (self)
+  if ((len(node.Nodes) == 3) && (node.Nodes[0].Name == "nil")) {
+    // puts
+    if node.Nodes[1].Name == ":puts" {
+      stmt := printStmt(node.Nodes[2], p)
+      if isRoot { p.AppendMainStatement(stmt) }
+
+      return stmt
+    }
+  }
+
+  var stmt goast.Node
+  return stmt
 }

@@ -35,24 +35,15 @@ func TranspileNode(isRoot bool, node ast.Node, p *program.Program) goast.Node {
   case ":str":
     return stringLiteral(node)
   case ":send":
-    if ((len(node.Nodes) == 3) && (node.Nodes[0].Name == "nil") && (node.Nodes[1].Name == ":puts")) {
-      stmt := printStmt(node.Nodes[2], p)
-      if isRoot { p.AppendMainStatement(stmt) }
-
-      return stmt
-    }
+    return sendStmt(isRoot, node, p)
   case ":lvasgn":
-    stmt := localVarAssignStmt(node, p)
-    if isRoot { p.AppendMainStatement(stmt) }
-
-    return stmt
+    return localVarAssignStmt(isRoot, node, p)
   case ":lvar":
     return localVariable(node)
   case ":if":
-    stmt := ifStmt(node, p)
-    if isRoot { p.AppendMainStatement(stmt) }
-
-    return stmt
+    return ifStmt(isRoot, node, p)
+  case ":def":
+    return def
   default:
     panic(fmt.Sprintf("Unexpected node type %v", node.Name))
 	}
